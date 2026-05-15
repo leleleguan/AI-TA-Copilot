@@ -13,6 +13,7 @@ import distributions
 from stack_manager import StackManager
 from stackup_step import StackupStep
 from ta_parser import parse_file
+from ai_explain import explain
 
 app = FastAPI(title="AI TA Copilot")
 
@@ -31,12 +32,19 @@ class AnalyzeRequest(BaseModel):
     usl: float | None = None
 
 
+class ExplainResult(BaseModel):
+    risk_level: str
+    summary: str
+    recommendations: list[str]
+
+
 class AnalyzeResponse(BaseModel):
     mean: float
     std: float
     cpk: float | None
     percent_ok: float | None
     percent_nok: float | None
+    explain: ExplainResult
 
 
 @app.get("/")
@@ -57,12 +65,19 @@ def _run_analysis(steps: list[StepInput], lsl: float | None, usl: float | None) 
     lengths = sm.calc_oal_dist()
     summary = sm.get_summary_data(lengths)
 
+    summary_dict = {
+        "mean": summary.mean, "std": summary.std,
+        "cpk": summary.cpk, "percent_ok": summary.percent_ok, "percent_nok": summary.percent_nok,
+    }
+    steps_list = [{"name": s.name, "tol_plus": s.tol_plus} for s in steps]
+
     return AnalyzeResponse(
         mean=summary.mean,
         std=summary.std,
         cpk=summary.cpk,
         percent_ok=summary.percent_ok,
         percent_nok=summary.percent_nok,
+        explain=ExplainResult(**explain(summary_dict, steps_list)),
     )
 
 
