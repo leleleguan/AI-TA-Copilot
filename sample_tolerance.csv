@@ -1,0 +1,6 @@
+name,mean,tol_plus,tol_minus
+Housing,50.0,0.1,0.1
+Bearing,25.0,0.05,0.05
+Shaft,49.85,0.08,0.08
+Spacer,5.0,0.02,0.02
+Cover,10.0,0.06,0.06

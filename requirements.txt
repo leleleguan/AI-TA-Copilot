@@ -3,3 +3,6 @@ uvicorn
 numpy
 scipy
 matplotlib
+pandas
+openpyxl
+python-multipart
